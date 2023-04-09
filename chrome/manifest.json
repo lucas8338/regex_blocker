@@ -1,0 +1,12 @@
+{
+    "name": "regex blocker",
+    "version": "0.0.0.1",
+    "description": "block anything in any site using regex",
+    "manifest_version": 3,
+    "author": "Lucas Monteiro",
+    "action":{
+        "default_popup": "index.html",
+        "default_title": "regex blocker"
+    },
+    "permissions": ["storage"]
+}
