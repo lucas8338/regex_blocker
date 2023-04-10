@@ -1,9 +1,9 @@
 {
     "name": "regex blocker",
-    "version": "0.0.0.1",
+    "version": "1.0.0.0",
     "description": "block anything in any site using regex",
     "manifest_version": 3,
-    "author": "Lucas Monteiro",
+    "author": "Lucas Monteiro: github.com/lucas8338",
     "action":{
         "default_popup": "index.html",
         "default_title": "regex blocker"
@@ -16,5 +16,6 @@
     }],
     "background":{
         "service_worker": "background.js"
-    }
+    },
+    "icons": {"1024":"icon.png"}
 }
