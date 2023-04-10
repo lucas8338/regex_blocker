@@ -8,5 +8,13 @@
         "default_popup": "index.html",
         "default_title": "regex blocker"
     },
-    "permissions": ["storage"]
+    "permissions": ["storage"],
+    "content_scripts": [{
+        "matches": ["*://*/*"],
+        "js": ["main.js"],
+        "match_about_blank": true
+    }],
+    "background":{
+        "service_worker": "background.js"
+    }
 }
