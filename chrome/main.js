@@ -1,69 +1,50 @@
 // content_Script
 
 /*
-    the script 'removeMatchedContents' takes a array with regexes and will
-    remove all element in the page which match any one these regex.
+    the script 'removeMatchedContents' takes a array with 
 */
-removeMatchedContents = function(regxs){
+removeMatchedContents = function(data, key){
     // a regex to extract the values inside the brackets "<>"
     // it will match the from the first "<" until the next ">"
     contentExtractReg = new RegExp(`<[^>]*>`, "i");
     body = document.getElementsByTagName("body")[0];
     // get all elements inside the body element
     inBody = body.getElementsByTagName("*");
-    for (let i=0; i < inBody.length; i++){
+    for (let i=0; i < inBody.length; i+=1){
         element = inBody[i];
         outerHtml = element.outerHTML;
         elementString = outerHtml.match(contentExtractReg)[0];
-        for (let j=0; j < regxs.length; j++){
-            actual_regx = regxs[j];
-            if (elementString.match(actual_regx) != null){
-                element.remove();
+        group = data[key][1];
+        reg_group = new RegExp(group, "i");
+        elementGroupMatch = elementString.match(reg_group);
+        if (elementGroupMatch != null){
+            if (elementGroupMatch.length > 1){
+                contents = data[key][2].split("#|#");
+                for (let k=0; k < elementGroupMatch.length - 1; k+=1){
+                    content = contents[k];
+                    reg_content = new RegExp(content, "i")
+                    if (elementGroupMatch[k+1].match(content) != null){
+                        element.remove()
+                    }
+                }
             }
         }
     }
 }
 
 /*
-    check if the url matches any of the urls selected in the first index of
-    data "data[n][0]" is suppose to be a regex for the url, if the regex
-    is match, will run the function "removeMatchedContents"
+    return the keys of the map which match with the url
 */
 matchUrl = function(data){
-    console.log("in search")
+    acceptedKeys = [];
     for (key in data){
         targetUrl = data[key][0];
-        if (targetUrl == ``){continue};
-        reg_targetUrl = new RegExp(targetUrl, "i");
-        if (document.URL.match(reg_targetUrl) != null){
-            console.log(`page match url on "${targetUrl}" running regex_blocker...`)
-            // get the contents "data[n][1]"then split the regex of the contents
-            // by the separator "#|#".
-            targetContents = data[key][1].split("#|#");
-            // a array to store the returns of the RegExp() struc
-            var reg_targetContents = [];
-            for (let i=0; i < targetContents.length; i++){
-                actual_targetContents = targetContents[i];
-                if (actual_targetContents == ``){continue};
-                reg_targetContents[reg_targetContents.length] = new RegExp(actual_targetContents, "i");
-            }
-            if (reg_targetContents.length == 0){break}
-            removeMatchedContents(reg_targetContents);
-            // some pages generate contents dinamicaly then is needed to run the
-            // script again, the code bellow will get the value of the third column
-            // of the row then will repeat the 'removeMatchedContents' by that value
-            // as integer.
-            repeatInterval = data[key][2];
-            repeatInterval = parseInt(repeatInterval);
-            // only run again if the variable "repeatInterval" is not NaN
-            // will be nan if the column is empty or a character cant be converted to int.
-            if (!isNaN(repeatInterval)){
-                setInterval(function(){
-                    removeMatchedContents(reg_targetContents);
-                }, repeatInterval);
-            }
+        reg = new RegExp(targetUrl, "i")
+        if (document.URL.match(reg) != null){
+            acceptedKeys[acceptedKeys.length] = key;
         }
     }
+    return acceptedKeys;
 }
 
 // connection required to send messages to background
@@ -73,7 +54,20 @@ chrome.runtime.onConnect.addListener(function(content){})
 // a callback trigged when a message is received
 chrome.runtime.onMessage.addListener(function(content){
     // run the marchUrl
-    matchUrl(content);
+    matchedUrls = matchUrl(content);
+    for (let i = 0; i < matchedUrls.length; i += 1){
+        key = matchedUrls[i];
+        document.onreadystatechange = function(){
+            removeMatchedContents(content, key);
+        }
+        repeat = content[key][3];
+        repeat = parseFloat(repeat);
+        if (!isNaN(repeat)){
+            setInterval(function(){
+                removeMatchedContents(content, key);
+            }, repeat);
+        }
+    }
 })
 
 // send the message to the background

@@ -15,9 +15,11 @@ document.getElementById("addRule_button").onclick = function(){
     col1.innerHTML = `<th><input type="text" id="col_${row.id}_0" class="col0"></th>`;
     col2 = row.insertCell(1);
     col2.innerHTML = `<th><input type="text" id="col_${row.id}_1" class="col1"></th>`;
-    col3 = row.insertCell(2);
-    col3.innerHTML = `<th><input type="text" size="2" id="col_${row.id}_2" class="col2"></th>`;
-    col4 = row.insertCell(3);
+    col2 = row.insertCell(2);
+    col2.innerHTML = `<th><input type="text" id="col_${row.id}_2" class="col2"></th>`;
+    col3 = row.insertCell(3);
+    col3.innerHTML = `<th><input type="text" size="2" id="col_${row.id}_3" class="col3"></th>`;
+    col4 = row.insertCell(4);
     // this will generate the button which will to delete the row
     col4.innerHTML = `<th><button type="button" id="deleteButton${nRows}" class="delete_button">delete</button></th>`;
     // this declare a function which will be runned when the button above is clicked
@@ -51,10 +53,11 @@ document.getElementById("save_button").onclick = async function(){
         // i'm using ".lastChild" cause i want to get the "button" element
         // which is inside the cell (is a child of the cell).
         urlRule = cols[0].lastChild.value.normalize();
-        contentRule = cols[1].lastChild.value.normalize();
-        repeat = cols[2].lastChild.value.normalize();
+        groupRule = cols[1].lastChild.value.normalize();
+        contentRule = cols[2].lastChild.value.normalize();
+        repeat = cols[3].lastChild.value.normalize();
         toSave = {};
-        toSave[key] = [urlRule, contentRule, repeat];
+        toSave[key] = [urlRule, groupRule, contentRule, repeat];
         // save the data in the browser storage, this will use the sync storage
         // so this will sync with the account
         // the chrome stores a map (json).
@@ -76,7 +79,7 @@ load = async function(){
         document.getElementById("addRule_button").click();
         rows = document.getElementsByClassName("ruleRow");
         row = rows[rows.length - 1];
-        for (let j=0; j<3; j++){
+        for (let j=0; j<4; j++){
             cell = row.querySelector(`.col${j}`);
             cell.value = actualArray[j];
         }
