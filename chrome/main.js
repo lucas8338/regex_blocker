@@ -55,17 +55,17 @@ chrome.runtime.onConnect.addListener(function(content){})
 chrome.runtime.onMessage.addListener(function(content){
     // run the marchUrl
     matchedUrls = matchUrl(content);
-    for (let i = 0; i < matchedUrls.length; i += 1){
-        key = matchedUrls[i];
-        document.onreadystatechange = function(){
+    document.onreadystatechange = function(){
+        for (let i = 0; i < matchedUrls.length; i += 1){
+            key = matchedUrls[i];
             removeMatchedContents(content, key);
-        }
-        repeat = content[key][3];
-        repeat = parseFloat(repeat);
-        if (!isNaN(repeat)){
-            setInterval(function(){
-                removeMatchedContents(content, key);
-            }, repeat);
+            repeat = content[key][3];
+            repeat = parseFloat(repeat);
+            if (!isNaN(repeat)){
+                setInterval(function(){
+                    removeMatchedContents(content, key);
+                }, repeat);
+            }
         }
     }
 })
